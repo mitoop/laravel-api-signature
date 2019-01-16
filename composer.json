@@ -22,7 +22,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Mitoop\\ApiSignature\\ServiceProvider"
+                "Mitoop\\ApiSignature\\ClientServiceProvider"
             ]
         }
     }
