@@ -219,8 +219,9 @@ class Client
 
     public function get($path, array $data = null)
     {
-        if ($data !== null) {
+        $this->clearDatas();
 
+        if ($data !== null) {
             $this->setDatas($data);
         }
 
@@ -231,6 +232,8 @@ class Client
 
     public function post($path, array $data = null)
     {
+        $this->clearDatas();
+
         if ($data !== null) {
             $this->setDatas($data);
         }
@@ -266,8 +269,6 @@ class Client
         if ($loggerHandler = $this->getLoggerHandler()) {
             $loggerHandler(['response' => $response]);
         }
-
-        $this->clearDatas();
 
         return $response;
     }
