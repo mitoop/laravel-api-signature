@@ -1,2 +1,2 @@
-# laravel-api-signature
-Laravel api signature.
+# Laravel api signature
+

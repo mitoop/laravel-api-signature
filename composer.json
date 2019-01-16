@@ -1,0 +1,29 @@
+{
+    "name": "mitoop/laravel-api-signature",
+    "description": "laravel api signature",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "徐夏冰",
+            "email": "037333@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.3",
+        "illuminate/support": "^5.7",
+        "moontoast/math": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mitoop\\ApiSignature\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mitoop\\ApiSignature\\ServiceProvider"
+            ]
+        }
+    }
+}
