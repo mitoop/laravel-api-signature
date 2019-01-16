@@ -36,7 +36,7 @@ class ClientServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['api-client', 'api-signature'];
+        return [ClientManager::class, Signature::class];
     }
 
 }
