@@ -35,6 +35,8 @@ class ClientManager
     }
 
     /**
+     * 生成client连接.
+     *
      * @param null $client
      *
      * @return Client
@@ -61,6 +63,10 @@ class ClientManager
         return $this->app['config']["api-signature.clients.{$client}"];
     }
 
+    /**
+     * 请求发起方的身份标识.
+     * @return mixed
+     */
     protected function getIdentity()
     {
         return $this->app['config']['api-signature.identity'];
@@ -78,6 +84,12 @@ class ClientManager
         ];
     }
 
+    /**
+     * @param $client string client标识
+     *
+     * @return Client
+     * @throws InvalidArgumentException
+     */
     protected function resolve($client)
     {
         $config = $this->getConfig($client);
@@ -117,7 +129,7 @@ class ClientManager
         if ($loggerHandler = $this->app['config']['api-signature.logger_handler']) {
             $client->setLoggerHandler($loggerHandler);
         }
-        
+
         return $client;
     }
 }
