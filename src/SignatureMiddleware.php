@@ -44,11 +44,11 @@ class SignatureMiddleware
 
         $clients = $this->app['config']->get('api-signature.clients');
 
-        $client = array_filter($clients, function ($client) use ($appId) {
+        $client = \current(array_filter($clients, function ($client) use ($appId) {
             return $client['app_id'] == $appId;
-        }, ARRAY_FILTER_USE_BOTH);
+        }, ARRAY_FILTER_USE_BOTH));
 
-        if ( ! isset($client['app_secret'])) {
+        if ( ! $client || ! isset($client['app_secret'])) {
             throw new InvalidAppIdException('Invalid app_id.');
         }
 
