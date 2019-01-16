@@ -20,11 +20,11 @@ class ClientServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->app->singleton('api-client', function ($app) {
+        $this->app->singleton(ClientManager::class, function ($app) {
             return new ClientManager($app);
         });
 
-        $this->app->singleton('api-signature', function ($app) {
+        $this->app->singleton(Signature::class, function ($app) {
             return new Signature();
         });
     }

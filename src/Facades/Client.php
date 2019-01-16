@@ -3,6 +3,7 @@
 namespace Mitoop\ApiSignature\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Mitoop\ApiSignature\ClientManager;
 
 /**
  * @method static \Mitoop\ApiSignature\Client  connection(string|null $client = null)
@@ -17,6 +18,6 @@ class Client extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'api-client';
+        return ClientManager::class;
     }
 }

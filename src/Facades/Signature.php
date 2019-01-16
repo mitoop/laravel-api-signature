@@ -18,6 +18,6 @@ class Signature extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'api-signature';
+        return \Mitoop\ApiSignature\Signature::class;
     }
 }
