@@ -3,7 +3,6 @@
 namespace Mitoop\ApiSignature;
 
 
-use Illuminate\Support\Facades\Cache;
 use Mitoop\ApiSignature\Exception\InvalidSignatureException;
 
 class Signature
@@ -45,7 +44,7 @@ class Signature
 
         $this->validTimestamp($timestamp)
              ->validNonce($nonce)
-             ->validHmac($secret, $signParams, $sign);
+             ->validHmac($signParams, $secret, $sign);
 
         $this->setNonceCache($nonce);
 
@@ -63,9 +62,10 @@ class Signature
 
     private function validTimestamp($time)
     {
-        $time = \intval($time);
+        $time        = \intval($time);
+        $currentTime = time();
 
-        if ($time <= 0 || time() - $time > self::TIME_OUT) {
+        if ($time <= 0 || $time > $currentTime || $currentTime - $time > self::TIME_OUT) {
             throw new InvalidSignatureException('Time out.');
         }
 
@@ -74,7 +74,7 @@ class Signature
 
     private function validNonce($nonce)
     {
-        if (\is_null($nonce) || ! Cache::has($nonce)) {
+        if (\is_null($nonce) || \Cache::has($nonce)) {
             throw new InvalidSignatureException('Not once');
         }
 
@@ -84,7 +84,7 @@ class Signature
     private function setNonceCache($nonce)
     {
         // redis driver is recommended
-        Cache::add($nonce, 1, self::TIME_OUT / 60);
+        \Cache::add($nonce, 1, self::TIME_OUT / 60);
     }
 
 }

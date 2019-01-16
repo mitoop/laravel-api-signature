@@ -34,6 +34,11 @@ class ClientManager
         $this->app = $app;
     }
 
+    /**
+     * @param null $client
+     *
+     * @return Client
+     */
     public function connection($client = null)
     {
         $client = $client ?: $this->getDefaultClient();

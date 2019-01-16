@@ -87,11 +87,13 @@ class Client
 
     public function setIp($ip)
     {
-        $ip = \ltrim($ip, 'http://');
-        $ip = \ltrim($ip, 'https://');
-        $ip = \rtrim($ip, '/');
+        if ($ip) {
+            $ip = \ltrim($ip, 'http://');
+            $ip = \ltrim($ip, 'https://');
+            $ip = \rtrim($ip, '/');
 
-        $this->ip = $ip;
+            $this->ip = $ip;
+        }
 
         return $this;
     }
@@ -103,12 +105,14 @@ class Client
 
     public function setScheme($scheme)
     {
-        $scheme = \strtolower($scheme);
+        if ($scheme) {
+            $scheme = \strtolower($scheme);
 
-        if ( ! in_array($scheme, [self::SCHEME_HTTP, self::SCHEME_HTTPS])) {
-            throw new \InvalidArgumentException('The supported schemes are : http and https');
+            if ( ! in_array($scheme, [self::SCHEME_HTTP, self::SCHEME_HTTPS])) {
+                throw new \InvalidArgumentException('The supported schemes are : http and https');
+            }
+            $this->scheme = $scheme;
         }
-        $this->scheme = $scheme;
 
         return $this;
     }
@@ -120,7 +124,9 @@ class Client
 
     public function setPort($port)
     {
-        $this->port = \intval($port);
+        if ($port) {
+            $this->port = \intval($port);
+        }
 
         return $this;
     }
@@ -218,7 +224,7 @@ class Client
             $this->setDatas($data);
         }
 
-        $this->setMethod('get');
+        $this->setMethod('GET');
 
         return $this->request($path);
     }
@@ -229,7 +235,7 @@ class Client
             $this->setDatas($data);
         }
 
-        $this->setMethod('post');
+        $this->setMethod('POST');
 
         return $this->request($path);
     }
@@ -241,7 +247,7 @@ class Client
 
         $url = $this->getUrl().'?'.$this->generateSignData();
         if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler(['url' => $url]);
+            $loggerHandler(['method' => $this->getMethod(), 'data' => $this->getDatas(), 'url' => $url]);
         }
 
         $client = new \GuzzleHttp\Client();
@@ -270,12 +276,12 @@ class Client
         $signData['timestamp'] = time();
         $nonce                 = $this->getNonce();
         $signData['nonce']     = $nonce;
-        $signData['sign']      = app('api-signature')::sign(\array_merge($signData, [
+        $signData['sign']      = app('api-signature')->sign(\array_merge($signData, [
             'http_method' => $this->getMethod(),
             'http_path'   => $this->getPath(),
         ]), $this->getAppSecret());
 
-        if ($this->getMethod() == 'get') {
+        if ($this->getMethod() == 'GET') {
             if (\count(array_diff($signData, $this->getDatas())) != count($signData)) {
                 throw new \InvalidArgumentException('Arguments conflicts');
             }
