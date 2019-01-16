@@ -20,7 +20,7 @@ class ClientServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->app->bind('api-client', function ($app) {
+        $this->app->singleton('api-client', function ($app) {
             return new ClientManager($app);
         });
 

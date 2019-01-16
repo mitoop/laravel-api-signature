@@ -260,11 +260,14 @@ class Client
                 'form_params' => $this->getDatas(),
             ];
         }
+
         $response = $client->request($method, $url, $data);
 
         if ($loggerHandler = $this->getLoggerHandler()) {
             $loggerHandler(['response' => $response]);
         }
+
+        $this->clearDatas();
 
         return $response;
     }
@@ -321,5 +324,10 @@ class Client
     protected function getNonce()
     {
         return $this->getIdentity().':'.\Illuminate\Support\Str::orderedUuid()->toString();
+    }
+
+    protected function clearDatas()
+    {
+        $this->params = [];
     }
 }
