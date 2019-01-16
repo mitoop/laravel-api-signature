@@ -17,7 +17,7 @@ class ClientServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/config/api-signature.php' => config_path('api-signature.php'),
-            ], 'config');
+            ]);
         }
 
         $this->app->bind('api-client', function ($app) {
