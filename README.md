@@ -1,6 +1,5 @@
 # Laravel api signature
 
 # Todos
-- Middleware
-- GuzzleHttp Response 
+- GuzzleHttp handle 
 

@@ -11,7 +11,7 @@ class ClientManager
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -25,7 +25,7 @@ class ClientManager
     /**
      * Create a new Client manager instance.
      *
-     * @param  \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Contracts\Foundation\Application $app
      *
      * @return void
      */
