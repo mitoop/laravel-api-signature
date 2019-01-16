@@ -144,7 +144,7 @@ class Client
         return self::HTTP_DEFAULT_PORT;
     }
 
-    public function setDatas($key, $value = null)
+    protected function setDatas($key, $value = null)
     {
         if (is_array($key)) {
             return $this->setArrayDatas($key);
