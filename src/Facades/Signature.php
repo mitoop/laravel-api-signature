@@ -4,6 +4,10 @@ namespace Mitoop\ApiSignature\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * @method static bool validSign($secret)
+ * @method static bool sign(array $params, $secret)
+ */
 class Signature extends Facade
 {
 

@@ -3,6 +3,8 @@
 namespace Mitoop\ApiSignature;
 
 
+use Mitoop\ApiSignature\Facades\Signature;
+
 class Client
 {
 
@@ -280,7 +282,7 @@ class Client
         $signData['timestamp'] = time();
         $nonce                 = $this->getNonce();
         $signData['nonce']     = $nonce;
-        $signData['sign']      = app('api-signature')->sign(\array_merge($signData, [
+        $signData['sign']      = Signature::sign(\array_merge($signData, [
             'http_method' => $this->getMethod(),
             'http_path'   => $this->getPath(),
         ]), $this->getAppSecret());
