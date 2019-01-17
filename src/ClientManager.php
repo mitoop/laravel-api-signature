@@ -75,12 +75,13 @@ class ClientManager
     protected function getDefaultConfig()
     {
         return [
-            'app_id'     => '',
-            'app_secret' => '',
-            'scheme'     => '',
-            'host'       => '',
-            'ip'         => '',
-            'port'       => '',
+            'app_id'         => '',
+            'app_secret'     => '',
+            'scheme'         => '',
+            'host'           => '',
+            'ip'             => '',
+            'port'           => '',
+            'https_cert_pem' => false,
         ];
     }
 
@@ -125,6 +126,7 @@ class ClientManager
         $client->setHost($config['host']);
         $client->setIp($config['ip']);
         $client->setPort($config['port']);
+        $client->setCertPem($config['https_cert_pem']);
 
         if ($loggerHandler = $this->app['config']['api-signature.logger_handler']) {
             $client->setLoggerHandler($loggerHandler);

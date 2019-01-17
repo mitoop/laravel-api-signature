@@ -35,6 +35,8 @@ class Client
 
     protected $loggerHandler;
 
+    protected $cert_pem;
+
     public function __construct($appId, $appSecret)
     {
         $this->setAppId($appId);
@@ -218,6 +220,18 @@ class Client
         return $this->loggerHandler;
     }
 
+    public function setCertPem($certPem)
+    {
+        $this->cert_pem = $certPem;
+
+        return $this;
+    }
+
+    protected function getCertPem()
+    {
+        return $this->cert_pem;
+    }
+
     public function get($path, array $data = null)
     {
         $this->clearDatas();
@@ -250,9 +264,6 @@ class Client
         $this->setPath($path);
 
         $url = $this->getUrl().'?'.$this->generateSignData();
-        if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $this->getDatas(), 'url' => $url]);
-        }
 
         try {
             $client = new \GuzzleHttp\Client();
@@ -264,6 +275,21 @@ class Client
                 $data = [
                     'form_params' => $this->getDatas(),
                 ];
+            }
+
+            if ($ip = $this->getIp()) {
+                $data['headers'] = [
+                    'Host' => $this->getHost(),
+                ];
+            }
+
+            // https 证书验证 https://guzzle-cn.readthedocs.io/zh_CN/latest/request-options.html#verify
+            if ($this->getScheme() == self::SCHEME_HTTPS) {
+                $data['verify'] = $this->getCertPem();
+            }
+
+            if ($loggerHandler = $this->getLoggerHandler()) {
+                $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $data, 'url' => $url]);
             }
 
             $response = $client->request($method, $url, $data);
