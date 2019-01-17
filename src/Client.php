@@ -2,9 +2,6 @@
 
 namespace Mitoop\ApiSignature;
 
-
-use Mitoop\ApiSignature\Facades\Signature;
-
 class Client
 {
 
@@ -40,6 +37,10 @@ class Client
      * @var \GuzzleHttp\Client
      */
     private $httpClient;
+
+    protected $certPem;
+
+    protected $container;
 
     public function __construct($appId, $appSecret, $client)
     {
@@ -225,6 +226,34 @@ class Client
         return $this->loggerHandler;
     }
 
+    public function setCertPem($certPem)
+    {
+        $this->certPem = $certPem;
+
+        return $this;
+    }
+
+    protected function getCertPem()
+    {
+        return $this->certPem;
+    }
+
+    public function setContainer($container)
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
+    /**
+     * 获取容器.
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    protected function getContainer()
+    {
+        return $this->container;
+    }
+
     public function get($path, array $data = null)
     {
         $this->clearDatas();
@@ -251,31 +280,66 @@ class Client
         return $this->request($path);
     }
 
-
     protected function request($path)
     {
         $this->setPath($path);
 
         $url = $this->getUrl().'?'.$this->generateSignData();
-        if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $this->getDatas(), 'url' => $url]);
+
+        try {
+            $method = $this->getMethod();
+
+            $data = [];
+            if ($method == 'POST') {
+                $data = [
+                    'form_params' => $this->getDatas(),
+                ];
+            }
+
+            if ($ip = $this->getIp()) {
+                $data['headers'] = [
+                    'Host' => $this->getHost(),
+                ];
+            }
+
+            // https 证书验证 https://guzzle-cn.readthedocs.io/zh_CN/latest/request-options.html#verify
+            if ($this->getScheme() == self::SCHEME_HTTPS) {
+                $data['verify'] = $this->getCertPem();
+            }
+
+            if ($loggerHandler = $this->getLoggerHandler()) {
+                $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $data, 'url' => $url]);
+            }
+
+            $response = $this->httpClient->request($method, $url, $data);
+
+            // 记录原始的返回内容
+            if ($loggerHandler = $this->getLoggerHandler()) {
+                $loggerHandler('API End', ['contents' => $response->getBody()]);
+            }
+
+            return $response;
+        } catch (\GuzzleHttp\Exception\TransferException $e) {
+            if ($loggerHandler = $this->getLoggerHandler()) {
+                $loggerHandler('API Response Transfer Error', [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                ]);
+            }
+
+            return false;
+        } catch (\Throwable $e) {
+            if ($loggerHandler = $this->getLoggerHandler()) {
+                $loggerHandler('API Response Handle Error', [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                ]);
+            }
+
+            return false;
         }
-        $method = $this->getMethod();
-
-        $data = [];
-        if ($method == 'POST') {
-            $data = [
-                'form_params' => $this->getDatas(),
-            ];
-        }
-
-        $response = $this->httpClient->request($method, $url, $data);
-
-        if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler('API End', ['response' => $response]);
-        }
-
-        return $response;
     }
 
     protected function generateSignData()
@@ -285,7 +349,8 @@ class Client
         $signData['timestamp'] = time();
         $nonce                 = $this->getNonce();
         $signData['nonce']     = $nonce;
-        $signData['sign']      = Signature::sign(\array_merge($signData, [
+        $signature             = $this->getContainer()->make(Signature::class);
+        $signData['sign']      = $signature->sign(\array_merge($signData, [
             'http_method' => $this->getMethod(),
             'http_path'   => $this->getPath(),
         ]), $this->getAppSecret());
@@ -329,7 +394,22 @@ class Client
 
     protected function getNonce()
     {
-        return $this->getIdentity().':'.\Illuminate\Support\Str::orderedUuid()->toString();
+        $identity = $this->getIdentity();
+        if ($this->getContainer()->version() >= '5.6.0') {
+            return $identity.':'.\Illuminate\Support\Str::orderedUuid()->toString();
+        }
+
+        $hash = \md5(\uniqid($identity, true).'-'.\random_int(1, 65535).'-'.\random_int(1, 65535));
+
+        return $identity.':'.substr($hash, 0, 8).
+                             '-'.
+                             \substr($hash, 8, 4).
+                             '-'.
+                             \substr($hash, 12, 4).
+                             '-'.
+                             \substr($hash, 16, 4).
+                             '-'.
+                             \substr($hash, 20, 12);
     }
 
     protected function clearDatas()
