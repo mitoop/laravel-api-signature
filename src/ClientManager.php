@@ -62,7 +62,7 @@ class ClientManager
     protected function get($client)
     {
         if (isset($this->connections[$client])) {
-            return $this->connections[$client]->setHttpClient($this->httpClient);
+            return $this->connections[$client]->setHttpClient(clone $this->httpClient);
         }
 
         return $this->resolve($client);
