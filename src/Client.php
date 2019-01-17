@@ -2,7 +2,6 @@
 
 namespace Mitoop\ApiSignature;
 
-
 use Mitoop\ApiSignature\Facades\Signature;
 
 class Client
@@ -255,24 +254,49 @@ class Client
             $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $this->getDatas(), 'url' => $url]);
         }
 
-        $client = new \GuzzleHttp\Client();
+        try {
+            $client = new \GuzzleHttp\Client();
 
-        $method = $this->getMethod();
+            $method = $this->getMethod();
 
-        $data = [];
-        if ($method == 'POST') {
-            $data = [
-                'form_params' => $this->getDatas(),
-            ];
+            $data = [];
+            if ($method == 'POST') {
+                $data = [
+                    'form_params' => $this->getDatas(),
+                ];
+            }
+
+            $response = $client->request($method, $url, $data);
+
+            $contents = $response->getBody()->getContents();
+
+            // 记录原始的返回内容
+            if ($loggerHandler = $this->getLoggerHandler()) {
+                $loggerHandler('API End', ['contents' => $contents]);
+            }
+
+            return \GuzzleHttp\json_decode($contents);
+        } catch (\GuzzleHttp\Exception\TransferException $e) {
+            if ($loggerHandler = $this->getLoggerHandler()) {
+                $loggerHandler('API Response Transfer Error', [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                ]);
+            }
+
+            return false;
+        } catch (\Throwable $e) {
+            if ($loggerHandler = $this->getLoggerHandler()) {
+                $loggerHandler('API Response Handle Error', [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                ]);
+            }
+
+            return false;
         }
-
-        $response = $client->request($method, $url, $data);
-
-        if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler('API End', ['response' => $response]);
-        }
-
-        return $response;
     }
 
     protected function generateSignData()
