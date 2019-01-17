@@ -25,7 +25,7 @@ class ClientServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Signature::class, function ($app) {
-            return new Signature();
+            return new Signature($app);
         });
     }
 

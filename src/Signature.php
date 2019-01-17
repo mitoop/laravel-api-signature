@@ -3,7 +3,6 @@
 namespace Mitoop\ApiSignature;
 
 
-use Cache;
 use Mitoop\ApiSignature\Exception\InvalidSignatureException;
 
 class Signature
@@ -21,6 +20,25 @@ class Signature
         'http_method',
         'http_path',
     ];
+
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * Create a new Client manager instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     *
+     * @return void
+     */
+    public function __construct($app)
+    {
+        $this->app = $app;
+    }
 
     /**
      * 生成签名.
@@ -49,8 +67,12 @@ class Signature
      * @return bool
      * @throws InvalidSignatureException
      */
-    public function validSign(\Illuminate\Http\Request $request)
+    public function validSign(\Illuminate\Http\Request $request = null)
     {
+        if (\is_null($request)) {
+            $request = $this->app['request'];
+        }
+
         $appId      = $request->query('app_id');
         $secret     = $this->validAppId($appId);
         $timestamp  = $request->query('timestamp', 0);
@@ -85,7 +107,7 @@ class Signature
             throw new InvalidSignatureException('app_id is lost.');
         }
 
-        $clients = \config('api-signature.clients');
+        $clients = $this->app['config']->get('api-signature.clients');
 
         $client = \current(array_filter($clients, function ($client) use ($appId) {
             return $client['app_id'] == $appId;
@@ -147,7 +169,7 @@ class Signature
      */
     private function validNonce($nonce)
     {
-        if (\is_null($nonce) || Cache::has($nonce)) {
+        if (\is_null($nonce) || $this->app['cache']->has($this->getNonceCacheKey($nonce))) {
             throw new InvalidSignatureException('Not once');
         }
 
@@ -161,8 +183,12 @@ class Signature
      */
     private function setNonceCache($nonce)
     {
-        // redis driver is recommended
-        Cache::add($nonce, 1, self::TIME_OUT / 60);
+        $this->app['cache']->add($this->getNonceCacheKey($nonce), 1, self::TIME_OUT / 60);
+    }
+
+    private function getNonceCacheKey($nonce)
+    {
+        return 'api:nonce:'.$nonce;
     }
 
 }
