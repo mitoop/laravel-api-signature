@@ -88,7 +88,7 @@ $signatureResponse->body(); // 获取原始输出信息
 $signatureResponse->json(); // 获取json格式的数据 取决于服务端返回数据格式
 ```
 
-## 
+## 感谢
 感谢大神 [zhuchichao](https://github.com/zhuzhichao) 提供技术指导并写了测试代码
 
 
