@@ -74,4 +74,6 @@ Mitoop\ApiSignature\SignatureMiddleware::class
 	}
 ``` 
 
+## 返回结果
+如果出现异常 将返回`false` 日志里有记录 如果成功 返回 服务端定义的结构 请使用`json`格式
 
