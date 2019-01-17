@@ -252,7 +252,7 @@ class Client
 
         $url = $this->getUrl().'?'.$this->generateSignData();
         if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler(['method' => $this->getMethod(), 'data' => $this->getDatas(), 'url' => $url]);
+            $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $this->getDatas(), 'url' => $url]);
         }
 
         $client = new \GuzzleHttp\Client();
@@ -269,7 +269,7 @@ class Client
         $response = $client->request($method, $url, $data);
 
         if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler(['response' => $response]);
+            $loggerHandler('API End', ['response' => $response]);
         }
 
         return $response;
@@ -298,7 +298,7 @@ class Client
 
         if ($loggerHandler = $this->getLoggerHandler()) {
             // nonce act as request id
-            $loggerHandler(['nonce' => $nonce]);
+            $loggerHandler('API Begin', ['nonce' => $nonce]);
         }
 
         return $signData;

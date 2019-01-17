@@ -15,7 +15,7 @@ return [
     ],
 
     'identity'       => '',
-    'logger_handler' => function (array $data) {
-        \Log::info('API_CLIENT_LOG', $data);
+    'logger_handler' => function ($message, array $data) {
+        \Log::info($message, $data);
     },
 ];
