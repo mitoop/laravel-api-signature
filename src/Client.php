@@ -286,14 +286,11 @@ class Client
 
         $url = $this->getUrl().'?'.$this->generateSignData();
 
-        try {
             $method = $this->getMethod();
 
-            $data = [];
+            $data = ['http_errors' => false];
             if ($method == 'POST') {
-                $data = [
-                    'form_params' => $this->getDatas(),
-                ];
+                $data['form_params'] = $this->getDatas();
             }
 
             if ($ip = $this->getIp()) {
@@ -318,28 +315,7 @@ class Client
                 $loggerHandler('API End', ['contents' => $response->getBody()]);
             }
 
-            return $response;
-        } catch (\GuzzleHttp\Exception\TransferException $e) {
-            if ($loggerHandler = $this->getLoggerHandler()) {
-                $loggerHandler('API Response Transfer Error', [
-                    'message' => $e->getMessage(),
-                    'file'    => $e->getFile(),
-                    'line'    => $e->getLine(),
-                ]);
-            }
-
-            return false;
-        } catch (\Throwable $e) {
-            if ($loggerHandler = $this->getLoggerHandler()) {
-                $loggerHandler('API Response Handle Error', [
-                    'message' => $e->getMessage(),
-                    'file'    => $e->getFile(),
-                    'line'    => $e->getLine(),
-                ]);
-            }
-
-            return false;
-        }
+            return new SignatureResponse($response);
     }
 
     protected function generateSignData()

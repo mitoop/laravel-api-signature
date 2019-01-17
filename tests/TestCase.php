@@ -14,6 +14,8 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 abstract class TestCase extends BaseTestCase
 {
     protected $testingClient = 'testing';
+    protected $testingHeaders = ['X-Foo' => 'Bar'];
+    protected $testingBody;
 
     /**
      * Get package providers.
@@ -35,9 +37,12 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        $this->testingBody = json_encode(['name' => 'mitoop']);
         $app->singleton(ClientManager::class, function ($app) {
             $mock    = new MockHandler([
-                new Response(200, ['X-Foo' => 'Bar']),
+                new Response(200, $this->testingHeaders, $this->testingBody),
+                new Response(400, $this->testingHeaders),
+                new Response(500, $this->testingHeaders),
             ]);
             $handler = HandlerStack::create($mock);
             return new ClientManager($app, new Client(['handler' => $handler]));
