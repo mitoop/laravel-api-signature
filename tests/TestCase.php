@@ -2,15 +2,23 @@
 
 namespace Tests;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\Request;
+use Mitoop\ApiSignature\ClientManager;
 use Mitoop\ApiSignature\ClientServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected $testingClient = 'testing';
+
     /**
      * Get package providers.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Foundation\Application $app
      * @return string[]
      */
     protected function getPackageProviders($app)
@@ -18,6 +26,31 @@ abstract class TestCase extends BaseTestCase
         return [
             ClientServiceProvider::class,
         ];
+    }
+
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application $app
+     */
+    protected function getEnvironmentSetUp($app)
+    {
+        $app->singleton(ClientManager::class, function ($app) {
+            $mock    = new MockHandler([
+                new Response(200, ['X-Foo' => 'Bar']),
+            ]);
+            $handler = HandlerStack::create($mock);
+            return new ClientManager($app, new Client(['handler' => $handler]));
+        });
+
+        $app['config']->set("api-signature.clients.{$this->testingClient}", [
+            'app_id'     => 'testing_app_id',
+            'app_secret' => 'testing_app_secret',
+            'scheme'     => '',
+            'host'       => 'api.testing',
+            'ip'         => '',
+            'port'       => '',
+        ]);
     }
 
     /**

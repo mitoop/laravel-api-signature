@@ -36,10 +36,16 @@ class Client
 
     protected $loggerHandler;
 
-    public function __construct($appId, $appSecret)
+    /**
+     * @var \GuzzleHttp\Client
+     */
+    private $httpClient;
+
+    public function __construct($appId, $appSecret, $client)
     {
         $this->setAppId($appId);
         $this->setAppSecret($appSecret);
+        $this->httpClient = $client;
     }
 
     protected function setMethod($method)
@@ -254,9 +260,6 @@ class Client
         if ($loggerHandler = $this->getLoggerHandler()) {
             $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $this->getDatas(), 'url' => $url]);
         }
-
-        $client = new \GuzzleHttp\Client();
-
         $method = $this->getMethod();
 
         $data = [];
@@ -266,7 +269,7 @@ class Client
             ];
         }
 
-        $response = $client->request($method, $url, $data);
+        $response = $this->httpClient->request($method, $url, $data);
 
         if ($loggerHandler = $this->getLoggerHandler()) {
             $loggerHandler('API End', ['response' => $response]);

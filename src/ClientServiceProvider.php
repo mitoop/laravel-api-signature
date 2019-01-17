@@ -21,7 +21,7 @@ class ClientServiceProvider extends ServiceProvider
         }
 
         $this->app->singleton(ClientManager::class, function ($app) {
-            return new ClientManager($app);
+            return new ClientManager($app, new \GuzzleHttp\Client);
         });
 
         $this->app->singleton(Signature::class, function ($app) {

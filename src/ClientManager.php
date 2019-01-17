@@ -23,15 +23,21 @@ class ClientManager
     protected $connections = [];
 
     /**
+     * @var \GuzzleHttp\Client
+     */
+    private $httpClient;
+
+    /**
      * Create a new Client manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application $app
      *
      * @return void
      */
-    public function __construct($app)
+    public function __construct($app, $client)
     {
         $this->app = $app;
+        $this->httpClient = $client;
     }
 
     /**
@@ -60,7 +66,27 @@ class ClientManager
 
     protected function getConfig($client)
     {
-        return $this->app['config']["api-signature.clients.{$client}"];
+        $config = $this->app['config']["api-signature.clients.{$client}"];
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Client [{$client}] is not defined.");
+        }
+
+        $config = \array_merge($this->getDefaultConfig(), $config);
+
+        if ($config['app_id'] == '') {
+            throw new InvalidArgumentException("app_id is not defined.");
+        }
+
+        if ($config['app_secret'] == '') {
+            throw new InvalidArgumentException("app_secret is not defined.");
+        }
+
+        if ($config['host'] == '') {
+            throw new InvalidArgumentException("host is not defined.");
+        }
+
+        return $config;
     }
 
     /**
@@ -93,29 +119,7 @@ class ClientManager
     protected function resolve($client)
     {
         $config = $this->getConfig($client);
-
-        if (is_null($config)) {
-            throw new InvalidArgumentException("Client [{$client}] is not defined.");
-        }
-
-        $defaultConfig = $this->getDefaultConfig();
-
-        $config = \array_merge($defaultConfig, $config);
-
-
-        if ($config['app_id'] == '') {
-            throw new InvalidArgumentException("app_id is not defined.");
-        }
-
-        if ($config['app_secret'] == '') {
-            throw new InvalidArgumentException("app_secret is not defined.");
-        }
-
-        if ($config['host'] == '') {
-            throw new InvalidArgumentException("host is not defined.");
-        }
-
-        $client = new Client($config['app_id'], $config['app_secret']);
+        $client = new Client($config['app_id'], $config['app_secret'], $this->httpClient);
 
         if ($identity = $this->getIdentity()) {
             $client->setIdentity($identity);
