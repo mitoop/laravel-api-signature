@@ -11,21 +11,21 @@ class ClientTest extends TestCase
         // 200 success
         $response = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->post('/', ['foo' => 'bar']);
         $this->assertTrue($response->isOk());
 
         // 400 ClientError
         $response = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->post('/', ['foo' => 'bar']);
         $this->assertTrue($response->isClientError());
 
         // 500 ServerError
         $response = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->post('/', ['foo' => 'bar']);
         $this->assertTrue($response->isServerError());
     }
@@ -35,21 +35,21 @@ class ClientTest extends TestCase
         // 200 success
         $response = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->get('/', ['foo' => 'bar']);
         $this->assertTrue($response->isOk());
 
         // 400 ClientError
         $response = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->get('/', ['foo' => 'bar']);
         $this->assertTrue($response->isClientError());
 
         // 500 ServerError
         $response = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->get('/', ['foo' => 'bar']);
         $this->assertTrue($response->isServerError());
     }

@@ -36,7 +36,7 @@ class Client
     /**
      * @var \GuzzleHttp\Client
      */
-    private $httpClient;
+    protected $httpClient;
 
     protected $certPem;
 
@@ -254,6 +254,13 @@ class Client
         return $this->container;
     }
 
+    public function setHttpClient($client)
+    {
+        $this->httpClient = $client;
+
+        return $this;
+    }
+
     public function get($path, array $data = null)
     {
         $this->clearDatas();
@@ -286,36 +293,37 @@ class Client
 
         $url = $this->getUrl().'?'.$this->generateSignData();
 
-            $method = $this->getMethod();
+        $method = $this->getMethod();
 
-            $data = ['http_errors' => false];
-            if ($method == 'POST') {
-                $data['form_params'] = $this->getDatas();
-            }
+        $data = ['http_errors' => false];
 
-            if ($ip = $this->getIp()) {
-                $data['headers'] = [
-                    'Host' => $this->getHost(),
-                ];
-            }
+        if ($method == 'POST') {
+            $data['form_params'] = $this->getDatas();
+        }
 
-            // https 证书验证 https://guzzle-cn.readthedocs.io/zh_CN/latest/request-options.html#verify
-            if ($this->getScheme() == self::SCHEME_HTTPS) {
-                $data['verify'] = $this->getCertPem();
-            }
+        if ($ip = $this->getIp()) {
+            $data['headers'] = [
+                'Host' => $this->getHost(),
+            ];
+        }
 
-            if ($loggerHandler = $this->getLoggerHandler()) {
-                $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $data, 'url' => $url]);
-            }
+        // https://guzzle-cn.readthedocs.io/zh_CN/latest/request-options.html#verify
+        if ($this->getScheme() == self::SCHEME_HTTPS) {
+            $data['verify'] = $this->getCertPem();
+        }
 
-            $response = $this->httpClient->request($method, $url, $data);
+        if ($loggerHandler = $this->getLoggerHandler()) {
+            $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $data, 'url' => $url]);
+        }
 
-            // 记录原始的返回内容
-            if ($loggerHandler = $this->getLoggerHandler()) {
-                $loggerHandler('API End', ['contents' => $response->getBody()]);
-            }
+        $response = $this->httpClient->request($method, $url, $data);
 
-            return new SignatureResponse($response);
+        // 记录原始的返回内容
+        if ($loggerHandler = $this->getLoggerHandler()) {
+            $loggerHandler('API End', ['status'=> $response->getStatusCode(), 'contents' => $response->getBody()->getContents()]);
+        }
+
+        return new SignatureResponse($response);
     }
 
     protected function generateSignData()

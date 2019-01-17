@@ -25,18 +25,18 @@ class ClientManager
     /**
      * @var \GuzzleHttp\Client
      */
-    private $httpClient;
+    protected $httpClient;
 
     /**
      * Create a new Client manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application $app
      *
-     * @return void
+     * @param  \GuzzleHttp\Client                           $client
      */
     public function __construct($app, $client)
     {
-        $this->app = $app;
+        $this->app        = $app;
         $this->httpClient = $client;
     }
 
@@ -47,7 +47,7 @@ class ClientManager
      *
      * @return Client
      */
-    public function connection($client = null)
+    public function connect($client = null)
     {
         $client = $client ?: $this->getDefaultClient();
 
@@ -61,9 +61,21 @@ class ClientManager
 
     protected function get($client)
     {
-        return $this->connections[$client] ?? $this->resolve($client);
+        if (isset($this->connections[$client])) {
+            return $this->connections[$client]->setHttpClient($this->httpClient);
+        }
+
+        return $this->resolve($client);
     }
 
+    /**
+     * 获取客户端的配置.
+     *
+     * @param string $client
+     *
+     * @return array
+     * @throws InvalidArgumentException
+     */
     protected function getConfig($client)
     {
         $config = $this->app['config']["api-signature.clients.{$client}"];
@@ -112,6 +124,8 @@ class ClientManager
     }
 
     /**
+     * 获取Client实例.
+     *
      * @param $client string client标识
      *
      * @return Client
@@ -120,7 +134,7 @@ class ClientManager
     protected function resolve($client)
     {
         $config = $this->getConfig($client);
-        $client = new Client($config['app_id'], $config['app_secret'], $this->httpClient);
+        $client = new Client($config['app_id'], $config['app_secret'], clone $this->httpClient);
 
         if ($identity = $this->getIdentity()) {
             $client->setIdentity($identity);

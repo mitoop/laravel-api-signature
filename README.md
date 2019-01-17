@@ -48,16 +48,16 @@ Laravel系统间的API验证处理. 每个系统既是服务端也是客户端.
      
 ## Demo
 ```
-Mitoop\ApiSignature\Facades\Client::connection($client)->get('/api/demo', ['参数数组']);
-Mitoop\ApiSignature\Facades\Client::connection($client)->post('/api/demo', ['参数数组']);
+Mitoop\ApiSignature\Facades\Client::connect($client)->get('/api/demo', ['参数数组']);
+Mitoop\ApiSignature\Facades\Client::connect($client)->post('/api/demo', ['参数数组']);
 
 如果设置了 `default`值 并要调取对应的客户端
-Mitoop\ApiSignature\Facades\Client::connection()->get('/api/demo', ['参数数组']);
-Mitoop\ApiSignature\Facades\Client::connection()->post('/api/demo', ['参数数组']);
+Mitoop\ApiSignature\Facades\Client::connect()->get('/api/demo', ['参数数组']);
+Mitoop\ApiSignature\Facades\Client::connect()->post('/api/demo', ['参数数组']);
 
 假如设置了`alias` 为ApiClient
-ApiClient::connection()->get('/api/demo', ['参数数组']);
-ApiClient::connection()->post('/api/demo', ['参数数组']);
+ApiClient::connect()->get('/api/demo', ['参数数组']);
+ApiClient::connect()->post('/api/demo', ['参数数组']);
 
 对外就这两种方法 `get`, `post`, 其他在配置文件里配置就行了
 
@@ -75,5 +75,20 @@ Mitoop\ApiSignature\SignatureMiddleware::class
 ``` 
 
 ## 返回结果
-如果出现异常 将返回`false` 日志里有记录 如果成功 返回 服务端定义的结构 请使用`json`格式
+远程调用使用了`guzzle/guzzle`包, 设置了`http_errors` 为 `false` 禁止抛出异常, 原始Response为`GuzzleHttp\Psr7\Response`
+在上面封装了一层Response `\Mitoop\ApiSignature\SignatureResponse` 
+
+`\Mitoop\ApiSignature\SignatureResponse` 参考自[zttp](https://github.com/kitetail/zttp)
+
+`SignatureResponse`常用方法
+```
+$signatureResponse->isOk(); // 请求是否成功 
+$signatureResponse->isSuccess(); // 请求是否成功 
+$signatureResponse->body(); // 获取原始输出信息
+$signatureResponse->json(); // 获取json格式的数据 取决于服务端返回数据格式
+```
+
+## 
+感谢大神 [zhuchichao](https://github.com/zhuzhichao) 提供技术指导并写了测试代码
+
 

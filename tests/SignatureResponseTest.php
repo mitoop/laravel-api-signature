@@ -25,15 +25,15 @@ class SignatureResponseTest extends TestCase
         parent::setUp();
         $this->response200 = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->post('/', ['foo' => 'bar']);
         $this->response400 = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->post('/', ['foo' => 'bar']);
         $this->response500 = $this->app
             ->make(ClientManager::class)
-            ->connection($this->testingClient)
+            ->connect($this->testingClient)
             ->post('/', ['foo' => 'bar']);
     }
 
