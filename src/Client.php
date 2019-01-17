@@ -2,8 +2,6 @@
 
 namespace Mitoop\ApiSignature;
 
-use Mitoop\ApiSignature\Facades\Signature;
-
 class Client
 {
 
@@ -35,7 +33,9 @@ class Client
 
     protected $loggerHandler;
 
-    protected $cert_pem;
+    protected $certPem;
+
+    protected $container;
 
     public function __construct($appId, $appSecret)
     {
@@ -222,14 +222,30 @@ class Client
 
     public function setCertPem($certPem)
     {
-        $this->cert_pem = $certPem;
+        $this->certPem = $certPem;
 
         return $this;
     }
 
     protected function getCertPem()
     {
-        return $this->cert_pem;
+        return $this->certPem;
+    }
+
+    public function setContainer($container)
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
+    /**
+     * 获取容器.
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    protected function getContainer()
+    {
+        return $this->container;
     }
 
     public function get($path, array $data = null)
@@ -257,7 +273,6 @@ class Client
 
         return $this->request($path);
     }
-
 
     protected function request($path)
     {
@@ -332,7 +347,8 @@ class Client
         $signData['timestamp'] = time();
         $nonce                 = $this->getNonce();
         $signData['nonce']     = $nonce;
-        $signData['sign']      = Signature::sign(\array_merge($signData, [
+        $signature             = $this->getContainer()->make(Signature::class);
+        $signData['sign']      = $signature->sign(\array_merge($signData, [
             'http_method' => $this->getMethod(),
             'http_path'   => $this->getPath(),
         ]), $this->getAppSecret());
@@ -376,7 +392,22 @@ class Client
 
     protected function getNonce()
     {
-        return $this->getIdentity().':'.\Illuminate\Support\Str::orderedUuid()->toString();
+        $identity = $this->getIdentity();
+        if ($this->getContainer()->version() >= '5.6.0') {
+            return $identity.':'.\Illuminate\Support\Str::orderedUuid()->toString();
+        }
+
+        $hash = \md5(\uniqid($identity, true).'-'.\random_int(1, 65535).'-'.\random_int(1, 65535));
+
+        return $identity.':'.substr($hash, 0, 8).
+                             '-'.
+                             \substr($hash, 8, 4).
+                             '-'.
+                             \substr($hash, 12, 4).
+                             '-'.
+                             \substr($hash, 16, 4).
+                             '-'.
+                             \substr($hash, 20, 12);
     }
 
     protected function clearDatas()

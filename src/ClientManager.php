@@ -127,6 +127,7 @@ class ClientManager
         $client->setIp($config['ip']);
         $client->setPort($config['port']);
         $client->setCertPem($config['https_cert_pem']);
+        $client->setContainer($this->app);
 
         if ($loggerHandler = $this->app['config']['api-signature.logger_handler']) {
             $client->setLoggerHandler($loggerHandler);
