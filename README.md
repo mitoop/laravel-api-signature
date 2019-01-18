@@ -106,9 +106,6 @@ app(\Mitoop\ApiSignature\Client::class)->connect('another-client')->get('/api/de
 app()->make(\Mitoop\ApiSignature\Client::class)->connect('another-client')->post('/api/demo', ['foo' => 'bar']);
 ```
 
-```
-Client对外提供两种方法： `get`, `post`, 对应发起`GET`请求或者`POST`请求。
-
 如果作为服务端，很可能要用到中间件进行校验，例如：
 
 ```php
