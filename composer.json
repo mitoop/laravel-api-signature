@@ -5,8 +5,12 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "徐夏冰",
+            "name": "mitoop",
             "email": "037333@gmail.com"
+        },
+        {
+            "name": "zhuzhichao",
+            "email": "me@zhuzhichao.com"
         }
     ],
     "require": {
