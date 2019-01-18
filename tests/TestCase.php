@@ -3,14 +3,13 @@
 namespace Tests;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Http\Request;
+use GuzzleHttp\Handler\MockHandler;
 use Mitoop\ApiSignature\ClientManager;
+use Tests\Utils\TestingSignatureLogger;
 use Mitoop\ApiSignature\ClientServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Tests\Utils\TestingSignatureLogger;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -41,12 +40,13 @@ abstract class TestCase extends BaseTestCase
         $this->testingBody = json_encode(['name' => 'mitoop']);
 
         $app->singleton(ClientManager::class, function ($app) {
-            $mock    = new MockHandler([
+            $mock = new MockHandler([
                 new Response(200, $this->testingHeaders, $this->testingBody),
                 new Response(400, $this->testingHeaders),
                 new Response(500, $this->testingHeaders),
             ]);
             $handler = HandlerStack::create($mock);
+
             return new ClientManager($app, new Client(['handler' => $handler]));
         });
 
@@ -59,7 +59,7 @@ abstract class TestCase extends BaseTestCase
             'port'       => '',
         ]);
 
-        $app['config']->set("api-signature.logger_handler", TestingSignatureLogger::class);
+        $app['config']->set('api-signature.logger_handler', TestingSignatureLogger::class);
 
         $app['log-mock'] = collect();
     }

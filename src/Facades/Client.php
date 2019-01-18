@@ -10,7 +10,6 @@ use Mitoop\ApiSignature\ClientManager;
  */
 class Client extends Facade
 {
-
     /**
      * Get the registered name of the component.
      *

@@ -2,12 +2,10 @@
 
 namespace Mitoop\ApiSignature;
 
-
 use Mitoop\ApiSignature\Exception\InvalidSignatureException;
 
 class Signature
 {
-
     const TIME_OUT = 30;
 
     /**
@@ -73,11 +71,11 @@ class Signature
             $request = $this->app['request'];
         }
 
-        $appId      = $request->query('app_id');
-        $secret     = $this->validAppId($appId);
-        $timestamp  = $request->query('timestamp', 0);
-        $nonce      = $request->query('nonce');
-        $sign       = $request->query('sign');
+        $appId = $request->query('app_id');
+        $secret = $this->validAppId($appId);
+        $timestamp = $request->query('timestamp', 0);
+        $nonce = $request->query('nonce');
+        $sign = $request->query('sign');
         $signParams = $request->query();
         $signParams = \array_merge($signParams, [
             'http_method' => $request->method(), // method() is always uppercase
@@ -149,7 +147,7 @@ class Signature
      */
     private function validTimestamp($time)
     {
-        $time        = \intval($time);
+        $time = \intval($time);
         $currentTime = time();
 
         if ($time <= 0 || $time > $currentTime || $currentTime - $time > self::TIME_OUT) {
@@ -190,5 +188,4 @@ class Signature
     {
         return 'api:nonce:'.$nonce;
     }
-
 }
