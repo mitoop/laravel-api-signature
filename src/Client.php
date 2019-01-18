@@ -4,7 +4,6 @@ namespace Mitoop\ApiSignature;
 
 class Client
 {
-
     const SCHEME_HTTP = 'http';
     const SCHEME_HTTPS = 'https';
 
@@ -116,7 +115,7 @@ class Client
         if ($scheme) {
             $scheme = \strtolower($scheme);
 
-            if ( ! in_array($scheme, [self::SCHEME_HTTP, self::SCHEME_HTTPS])) {
+            if (! in_array($scheme, [self::SCHEME_HTTP, self::SCHEME_HTTPS])) {
                 throw new \InvalidArgumentException('The supported schemes are : http and https');
             }
             $this->scheme = $scheme;
@@ -333,13 +332,13 @@ class Client
 
     protected function generateSignData()
     {
-        $signData              = [];
-        $signData['app_id']    = $this->getAppId();
+        $signData = [];
+        $signData['app_id'] = $this->getAppId();
         $signData['timestamp'] = time();
-        $nonce                 = $this->getNonce();
-        $signData['nonce']     = $nonce;
-        $signature             = $this->getContainer()->make(Signature::class);
-        $signData['sign']      = $signature->sign(\array_merge($signData, [
+        $nonce = $this->getNonce();
+        $signData['nonce'] = $nonce;
+        $signature = $this->getContainer()->make(Signature::class);
+        $signData['sign'] = $signature->sign(\array_merge($signData, [
             'http_method' => $this->getMethod(),
             'http_path'   => $this->getPath(),
         ]), $this->getAppSecret());
@@ -361,7 +360,7 @@ class Client
     protected function getUrl()
     {
         $scheme = $this->getScheme();
-        $url    = $scheme.'://';
+        $url = $scheme.'://';
 
         if ($ip = $this->getIp()) {
             $url .= $ip;
@@ -375,7 +374,6 @@ class Client
         }
 
         return $url.$this->getPath();
-
     }
 
     protected function getNonce()

@@ -2,12 +2,10 @@
 
 namespace Mitoop\ApiSignature;
 
-
 use InvalidArgumentException;
 
 class ClientManager
 {
-
     /**
      * The application instance.
      *
@@ -36,7 +34,7 @@ class ClientManager
      */
     public function __construct($app, $client)
     {
-        $this->app        = $app;
+        $this->app = $app;
         $this->httpClient = $client;
     }
 
@@ -85,15 +83,15 @@ class ClientManager
         $config = \array_merge($this->getDefaultConfig(), $config);
 
         if ($config['app_id'] == '') {
-            throw new InvalidArgumentException("app_id is not defined.");
+            throw new InvalidArgumentException('app_id is not defined.');
         }
 
         if ($config['app_secret'] == '') {
-            throw new InvalidArgumentException("app_secret is not defined.");
+            throw new InvalidArgumentException('app_secret is not defined.');
         }
 
         if ($config['host'] == '') {
-            throw new InvalidArgumentException("host is not defined.");
+            throw new InvalidArgumentException('host is not defined.');
         }
 
         return $config;
