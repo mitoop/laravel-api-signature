@@ -61,11 +61,9 @@ class ClientManager
 
     protected function get($client)
     {
-        if (isset($this->connections[$client])) {
-            return $this->connections[$client]->setHttpClient(clone $this->httpClient);
-        }
+        $clientInstance = $this->connections[$client] ?? $this->resolve($client);
 
-        return $this->resolve($client);
+        return $clientInstance->setHttpClient(clone $this->httpClient);
     }
 
     /**
@@ -134,7 +132,7 @@ class ClientManager
     protected function resolve($client)
     {
         $config = $this->getConfig($client);
-        $client = new Client($config['app_id'], $config['app_secret'], clone $this->httpClient);
+        $client = new Client($config['app_id'], $config['app_secret']);
 
         if ($identity = $this->getIdentity()) {
             $client->setIdentity($identity);

@@ -42,11 +42,10 @@ class Client
 
     protected $container;
 
-    public function __construct($appId, $appSecret, $client)
+    public function __construct($appId, $appSecret)
     {
         $this->setAppId($appId);
         $this->setAppSecret($appSecret);
-        $this->httpClient = $client;
     }
 
     protected function setMethod($method)
