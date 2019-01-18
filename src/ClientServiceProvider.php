@@ -6,7 +6,6 @@ use Illuminate\Support\ServiceProvider;
 
 class ClientServiceProvider extends ServiceProvider
 {
-
     /**
      * Register the service provider.
      *
@@ -38,5 +37,4 @@ class ClientServiceProvider extends ServiceProvider
     {
         return [ClientManager::class, Signature::class];
     }
-
 }

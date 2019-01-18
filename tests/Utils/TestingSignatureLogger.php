@@ -2,7 +2,6 @@
 
 namespace Tests\Utils;
 
-
 use Illuminate\Support\Collection;
 use Mitoop\ApiSignature\SignatureLoggerInterface;
 

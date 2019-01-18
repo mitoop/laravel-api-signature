@@ -2,15 +2,14 @@
 
 namespace Mitoop\ApiSignature;
 
+use Mitoop\ApiSignature\Facades\Signature;
 use Illuminate\Contracts\Foundation\Application;
 use Mitoop\ApiSignature\Exception\InvalidSignatureException;
-use Mitoop\ApiSignature\Facades\Signature;
 
 class SignatureMiddleware
 {
-
     /**
-     * The Laravel Application
+     * The Laravel Application.
      */
     protected $app;
 
