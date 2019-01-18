@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Mitoop\ApiSignature\ClientManager;
 use Mitoop\ApiSignature\ClientServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Tests\Utils\TestingSignatureLogger;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -38,6 +39,7 @@ abstract class TestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app)
     {
         $this->testingBody = json_encode(['name' => 'mitoop']);
+
         $app->singleton(ClientManager::class, function ($app) {
             $mock    = new MockHandler([
                 new Response(200, $this->testingHeaders, $this->testingBody),
@@ -56,6 +58,10 @@ abstract class TestCase extends BaseTestCase
             'ip'         => '',
             'port'       => '',
         ]);
+
+        $app['config']->set("api-signature.logger_handler", TestingSignatureLogger::class);
+
+        $app['log-mock'] = collect();
     }
 
     /**

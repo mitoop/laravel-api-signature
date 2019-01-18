@@ -146,7 +146,7 @@ class ClientManager
         $client->setContainer($this->app);
 
         if ($loggerHandler = $this->app['config']['api-signature.logger_handler']) {
-            $client->setLoggerHandler($loggerHandler);
+            $client->setLoggerHandler(new $loggerHandler);
         }
 
         return $client;

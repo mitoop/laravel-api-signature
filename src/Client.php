@@ -213,16 +213,26 @@ class Client
         return $this->identity;
     }
 
-    public function setLoggerHandler(\Closure $handler)
+    public function setLoggerHandler(SignatureLoggerInterface $handler)
     {
         $this->loggerHandler = $handler;
 
         return $this;
     }
 
+    /**
+     * @return SignatureLoggerInterface
+     */
     protected function getLoggerHandler()
     {
         return $this->loggerHandler;
+    }
+
+    protected function resolveLog(string $message, array $data)
+    {
+        if ($loggerHandler = $this->getLoggerHandler()) {
+            $loggerHandler->handle($message, $data);
+        }
     }
 
     public function setCertPem($certPem)
@@ -311,16 +321,12 @@ class Client
             $data['verify'] = $this->getCertPem();
         }
 
-        if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler('API Data', ['method' => $this->getMethod(), 'data' => $data, 'url' => $url]);
-        }
+        $this->resolveLog('API Data', ['method' => $this->getMethod(), 'data' => $data, 'url' => $url]);
 
         $response = $this->httpClient->request($method, $url, $data);
 
         // 记录原始的返回内容
-        if ($loggerHandler = $this->getLoggerHandler()) {
-            $loggerHandler('API End', ['status'=> $response->getStatusCode(), 'contents' => $response->getBody()->getContents()]);
-        }
+        $this->resolveLog('API End', ['status'=> $response->getStatusCode(), 'contents' => $response->getBody()->getContents()]);
 
         return new SignatureResponse($response);
     }
@@ -347,10 +353,7 @@ class Client
 
         $signData = http_build_query($signData, null, '&');
 
-        if ($loggerHandler = $this->getLoggerHandler()) {
-            // nonce act as request id
-            $loggerHandler('API Begin', ['nonce' => $nonce]);
-        }
+        $this->resolveLog('API Begin', ['nonce' => $nonce]);
 
         return $signData;
     }

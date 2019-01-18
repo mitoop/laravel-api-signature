@@ -28,9 +28,5 @@ return [
 
     'identity'       => '', // 标识当前系统的身份 用户生成 nonce request id 时作为前缀
 
-    'logger_handler' => function ($message, array $data) {
-        if(config('app.debug')) {
-            \Log::info($message, $data);
-        }
-     },
+    'logger_handler' => \Mitoop\ApiSignature\DefaultSignatureLogger::class,
 ];
