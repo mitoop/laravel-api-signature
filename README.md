@@ -4,7 +4,7 @@ Laravel 多系统之间的 API 验证处理，每个系统既是服务端也是�
 
 消息认证码(MAC)使用`sha256`哈希函数, sha256目前足够安全(相对于`sha1` `md5`) 又快速(相对于`sha3`)
 
-使用`nonce`+`timestamp`来防止重放攻击 `nonce`依赖于`key-value`类型的内存性缓存,  需要`Laravel`设置默认缓存驱动为`redis` 或者 `memcache`
+使用`nonce`+`timestamp`来防止重放攻击 `nonce`依赖于`key-value`类型的内存型缓存,  需要`Laravel`设置默认缓存驱动为`redis` 或者 `memcache`
 
 
 ## 安装 Install
