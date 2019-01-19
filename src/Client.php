@@ -297,13 +297,15 @@ class Client
 
     protected function request($path)
     {
-        $this->setPath($path);
+        $requestStart = \time();
 
-        $url = $this->getUrl().'?'.$this->generateSignData();
+        $url = $this->getUrl($path);
 
         $method = $this->getMethod();
 
-        $data = ['http_errors' => false];
+        $data = [
+            'http_errors' => false
+        ];
 
         if ($method == 'POST') {
             $data['form_params'] = $this->getDatas();
@@ -315,7 +317,6 @@ class Client
             ];
         }
 
-        // https://guzzle-cn.readthedocs.io/zh_CN/latest/request-options.html#verify
         if ($this->getScheme() == self::SCHEME_HTTPS) {
             $data['verify'] = $this->getCertPem();
         }
@@ -324,8 +325,14 @@ class Client
 
         $response = $this->httpClient->request($method, $url, $data);
 
-        // 记录原始的返回内容
-        $this->resolveLog('API End', ['status'=> $response->getStatusCode(), 'contents' => $response->getBody()->getContents()]);
+        $requestEnd = \time();
+        $this->resolveLog('API End', [
+            'status' => $response->getStatusCode(),
+            'contents' => $response->getBody()->getContents(),
+            'request_start' => $requestStart,
+            'request_end' => $requestEnd,
+            'time' => ($requestEnd-$requestStart).'s',
+        ]);
 
         return new SignatureResponse($response);
     }
@@ -352,13 +359,15 @@ class Client
 
         $signData = http_build_query($signData, null, '&');
 
-        $this->resolveLog('API Begin', ['nonce' => $nonce]);
+        $this->resolveLog('API Start', ['nonce' => $nonce]);
 
         return $signData;
     }
 
-    protected function getUrl()
+    protected function getUrl($path)
     {
+        $this->setPath($path);
+
         $scheme = $this->getScheme();
         $url = $scheme.'://';
 
@@ -373,7 +382,7 @@ class Client
             $url .= ':'.$port;
         }
 
-        return $url.$this->getPath();
+        return $url.$this->getPath().'?'.$this->generateSignData();
     }
 
     protected function getNonce()
