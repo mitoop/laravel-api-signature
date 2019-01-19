@@ -68,10 +68,9 @@ Laravel 多系统之间的 API 验证处理，每个系统既可以作为客户�
 ],
 // 当前系统的身份标识 [必填] 当向其他系统发起请求时，会使用这个身份标识作为前缀，生成的唯一的标识码，各个系统请使用不同的标识
 'identity'       => '',
-// 日志处理回调方法 [必填] 日志回调方法会记录请求的数据日志，参数为 string $message, array $data
-'logger_handler' => function ($message, array $data) {
-   \Log::info($message, $data);
-},
+// 日志处理回调类 [必填] 日志会记录请求的数据，参数为 string $message, array $data
+// 自定义处理类的时候必需实现 \Mitoop\ApiSignature\SignatureLoggerInterface 接口
+'logger_handler' => \Mitoop\ApiSignature\DefaultSignatureLogger::class, 
  ``` 
 
 
@@ -84,12 +83,19 @@ ApiClient::connect('another-client')->get('/api/demo', ['foo' => 'bar']);
 ApiClient::connect('another-client')->post('/api/demo', ['foo' => 'bar']);
 ```
 
-如果设置了 `default`值 会向默认的客户端发起请求 这个时候不用指定connect的客户端
+如果设置了 `default`值 并向默认的客户端发起请求 这个时候不用指定connect的客户端
 
 ```php
 ApiClient::connect()->get('/api/demo', ['foo' => 'bar']);
 ApiClient::connect()->post('/api/demo', ['foo' => 'bar']);
+
+or
+
+ApiClient::get('/api/demo', ['foo' => 'bar']);
+ApiClient::post('/api/demo', ['foo' => 'bar']);
+
 ```
+
 
 如有没有设置`alias` 那么可以用`Facade` 或者 容器调用 
 
