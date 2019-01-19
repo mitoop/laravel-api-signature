@@ -149,4 +149,16 @@ class ClientManager
 
         return $client;
     }
+
+    /**
+     * Dynamically call the default client instance.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->connect()->$method(...$parameters);
+    }
 }

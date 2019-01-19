@@ -299,7 +299,7 @@ class Client
     {
         $requestStart = \time();
 
-        $url = $this->getUrl($path);
+        $url = $this->createUrl($path);
 
         $method = $this->getMethod();
 
@@ -337,12 +337,12 @@ class Client
         return new SignatureResponse($response);
     }
 
-    protected function generateSignData()
+    protected function createSignData()
     {
         $signData = [];
         $signData['app_id'] = $this->getAppId();
         $signData['timestamp'] = time();
-        $nonce = $this->getNonce();
+        $nonce = $this->createNonce();
         $signData['nonce'] = $nonce;
         $signature = $this->getContainer()->make(Signature::class);
         $signData['sign'] = $signature->sign(\array_merge($signData, [
@@ -364,7 +364,7 @@ class Client
         return $signData;
     }
 
-    protected function getUrl($path)
+    protected function createUrl($path)
     {
         $this->setPath($path);
 
@@ -382,10 +382,10 @@ class Client
             $url .= ':'.$port;
         }
 
-        return $url.$this->getPath().'?'.$this->generateSignData();
+        return $url.$this->getPath().'?'.$this->createSignData();
     }
 
-    protected function getNonce()
+    protected function createNonce()
     {
         $identity = $this->getIdentity();
         if ($this->getContainer()->version() >= '5.6.0') {

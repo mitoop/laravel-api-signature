@@ -42,7 +42,7 @@ Laravel 多系统之间的 API 验证处理，每个系统既可以作为客户�
        'scheme'         => '', // scheme [非必填] http 或者 https 默认http
        'host'           => 'client-one.test', // 基础host [必填] 如 : www.baidu.com 
        'ip'             => '127.0.0.1', // host对应ip [非必填] 指定ip可以减少一次DNS查询还会降低域名劫持的风险
-       'port'           => '', // 端口 [非必填] 默认 80
+       'port'           => '', // 端口 [非必填] http 默认 80 https 默认 443
        'https_cert_pem' => '', // SSL证书文件路径 [非必填] 当shceme为https 即要发起https请求时 要配置该证书 可选项 1. true 启用验证并使用系统的证书 2. false 不进行验证 3. 配置自己的证书路径 默认 false
    ],
    'another-client' => [ // 另外一个客户端

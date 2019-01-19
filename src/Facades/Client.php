@@ -7,6 +7,8 @@ use Mitoop\ApiSignature\ClientManager;
 
 /**
  * @method static \Mitoop\ApiSignature\Client  connect(string|null $client = null)
+ * @method static \Mitoop\ApiSignature\SignatureResponse  get($path, array $data = null)
+ * @method static \Mitoop\ApiSignature\SignatureResponse  post($path, array $data = null)
  */
 class Client extends Facade
 {
