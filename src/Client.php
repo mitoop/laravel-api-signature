@@ -2,6 +2,12 @@
 
 namespace Mitoop\ApiSignature;
 
+/**
+ * @method  SignatureResponse  get($path, array $data = null, array $headers = null)
+ * @method  SignatureResponse  post($path, array $data = null, array $headers = null)
+ * @method  SignatureResponse  put($path, array $data = null, array $headers = null)
+ * @method  SignatureResponse  delete($path, array $data = null, array $headers = null)
+ */
 class Client
 {
 
@@ -283,7 +289,7 @@ class Client
         return $this;
     }
 
-    protected function request($path, array $headers)
+    protected function request(string $path, array $headers)
     {
         $requestStart = \time();
 
@@ -418,8 +424,8 @@ class Client
         }
 
         $path    = $args[0];
-        $datas   = isset($args[1]) ? $args[1] : [];
-        $headers = isset($args[2]) ? $args[2] : [];
+        $datas   = $args[1] ?? [];
+        $headers = $args[2] ?? [];
 
         if ( ! \in_array($method, self::SUPPORTED_HTTP_METHODS)) {
             throw new \InvalidArgumentException('The magic method is not supported');
