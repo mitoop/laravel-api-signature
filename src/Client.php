@@ -4,11 +4,25 @@ namespace Mitoop\ApiSignature;
 
 class Client
 {
+
     const SCHEME_HTTP = 'http';
     const SCHEME_HTTPS = 'https';
 
     const HTTP_DEFAULT_PORT = 80;
     const HTTPS_DEFAULT_PORT = 443;
+
+    const FORM_DATA_METHODS = [
+          'POST',
+          'PUT',
+          'DELETE'
+    ];
+
+    const SUPPORTED_HTTP_METHODS = [
+        'get',
+        'post',
+        'put',
+        'delete',
+    ];
 
     protected $params = [];
 
@@ -254,7 +268,7 @@ class Client
     }
 
     /**
-     * 获取容器.
+     * Get Container Instance.
      * @return \Illuminate\Contracts\Foundation\Application
      */
     protected function getContainer()
@@ -269,61 +283,17 @@ class Client
         return $this;
     }
 
-    public function get($path, array $data = null)
-    {
-        $this->clearDatas();
-
-        if ($data !== null) {
-            $this->setDatas($data);
-        }
-
-        $this->setMethod('GET');
-
-        return $this->request($path);
-    }
-
-    public function post($path, array $data = null)
-    {
-        $this->clearDatas();
-
-        if ($data !== null) {
-            $this->setDatas($data);
-        }
-
-        $this->setMethod('POST');
-
-        return $this->request($path);
-    }
-
-    protected function request($path)
+    protected function request($path, array $headers)
     {
         $requestStart = \time();
 
         $url = $this->createUrl($path);
 
-        $method = $this->getMethod();
-
-        $data = [
-            'http_errors' => false
-        ];
-
-        if ($method == 'POST') {
-            $data['form_params'] = $this->getDatas();
-        }
-
-        if ($ip = $this->getIp()) {
-            $data['headers'] = [
-                'Host' => $this->getHost(),
-            ];
-        }
-
-        if ($this->getScheme() == self::SCHEME_HTTPS) {
-            $data['verify'] = $this->getCertPem();
-        }
+        $data = $this->createHttpData($headers);
 
         $this->resolveLog('API Data', ['method' => $this->getMethod(), 'data' => $data, 'url' => $url]);
 
-        $response = $this->httpClient->request($method, $url, $data);
+        $response = $this->httpClient->request($this->getMethod(), $url, $data);
 
         $requestEnd = \time();
         $this->resolveLog('API End', [
@@ -405,8 +375,62 @@ class Client
                              \substr($hash, 20, 12);
     }
 
+    protected function createHttpData(array $headers)
+    {
+        $data = [];
+        $data['http_errors'] = false;
+        $data['headers'] = [];
+        
+        if(\in_array($this->getMethod(), self::FORM_DATA_METHODS)) {
+            $data['form_params'] = $this->getDatas();
+        }
+
+        foreach ($headers as $header => $value) {
+            $data['headers'][$header] = $value;
+        }
+
+        if ($ip = $this->getIp()) {
+            $data['headers'] = [
+                'Host' => $this->getHost(),
+            ];
+        }
+
+        if ($this->getScheme() == self::SCHEME_HTTPS) {
+            $data['verify'] = $this->getCertPem();
+        }
+        
+        if(empty($data['headers'])) {
+            unset($data['headers']);
+        }
+
+        return $data;
+    }
+
     protected function clearDatas()
     {
         $this->params = [];
+    }
+
+    public function __call($method, $args)
+    {
+        if (count($args) < 1) {
+            throw new \InvalidArgumentException('Magic request methods require at least a URI');
+        }
+
+        $path    = $args[0];
+        $datas   = isset($args[1]) ? $args[1] : [];
+        $headers = isset($args[2]) ? $args[2] : [];
+
+        if ( ! \in_array($method, self::SUPPORTED_HTTP_METHODS)) {
+            throw new \InvalidArgumentException('The magic method is not supported');
+        }
+
+        $this->clearDatas();
+
+        $this->setMethod(\strtoupper($method));
+
+        $this->setArrayDatas($datas);
+
+        return $this->request($path, $headers);
     }
 }

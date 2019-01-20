@@ -38,13 +38,6 @@ class ClientManager
         $this->httpClient = $client;
     }
 
-    /**
-     * 生成client连接.
-     *
-     * @param null $client
-     *
-     * @return Client
-     */
     public function connect($client = null)
     {
         $client = $client ?: $this->getDefaultClient();
@@ -64,14 +57,6 @@ class ClientManager
         return $clientInstance->setHttpClient(clone $this->httpClient);
     }
 
-    /**
-     * 获取客户端的配置.
-     *
-     * @param string $client
-     *
-     * @return array
-     * @throws InvalidArgumentException
-     */
     protected function getConfig($client)
     {
         $config = $this->app['config']["api-signature.clients.{$client}"];
@@ -97,10 +82,6 @@ class ClientManager
         return $config;
     }
 
-    /**
-     * 请求发起方的身份标识.
-     * @return mixed
-     */
     protected function getIdentity()
     {
         return $this->app['config']['api-signature.identity'];
@@ -119,14 +100,6 @@ class ClientManager
         ];
     }
 
-    /**
-     * 获取Client实例.
-     *
-     * @param $client string client标识
-     *
-     * @return Client
-     * @throws InvalidArgumentException
-     */
     protected function resolve($client)
     {
         $config = $this->getConfig($client);

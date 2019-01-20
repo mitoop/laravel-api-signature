@@ -8,9 +8,6 @@ class Signature
 {
     const TIME_OUT = 30;
 
-    /**
-     * @var array 签名用的key.
-     */
     protected $signKeys = [
         'app_id',
         'timestamp',
@@ -39,7 +36,7 @@ class Signature
     }
 
     /**
-     * 生成签名.
+     * Get sinature.
      *
      * @param array $params
      * @param       $secret
@@ -58,7 +55,7 @@ class Signature
     }
 
     /**
-     * 校验签名.
+     * Validate signature.
      *
      * @param \Illuminate\Http\Request $request
      *
@@ -92,7 +89,7 @@ class Signature
     }
 
     /**
-     * 校验app id并根据app id返回密匙.
+     * Validate app id and get app secret.
      *
      * @param $appId
      *
@@ -105,7 +102,7 @@ class Signature
             throw new InvalidSignatureException('app_id is lost.');
         }
 
-        $clients = $this->app['config']->get('api-signature.clients');
+        $clients = $this->app['config']->get('api-signature.clients', []);
 
         $client = \current(array_filter($clients, function ($client) use ($appId) {
             return $client['app_id'] == $appId;
@@ -119,11 +116,11 @@ class Signature
     }
 
     /**
-     * 校验消息认证码.
+     * Validate hmac.
      *
-     * @param $params array 用来校验的参数
-     * @param $secret string 密匙
-     * @param $hmac   string 消息认证码
+     * @param $params array
+     * @param $secret string
+     * @param $hmac   string
      *
      * @return $this
      * @throws InvalidSignatureException
@@ -138,7 +135,7 @@ class Signature
     }
 
     /**
-     * 校验时间.
+     * Validate timestamp.
      *
      * @param $time
      *
@@ -158,7 +155,7 @@ class Signature
     }
 
     /**
-     * 校验nonce.
+     * Validate nonce.
      *
      * @param $nonce
      *
@@ -175,7 +172,7 @@ class Signature
     }
 
     /**
-     * 生成nonce缓存.
+     * Create nonce cache.
      *
      * @param $nonce
      */
