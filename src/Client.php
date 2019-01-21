@@ -433,9 +433,9 @@ class Client
 
         $this->clearDatas();
 
-        $this->setMethod(\strtoupper($method));
-
         $this->setArrayDatas($datas);
+
+        $this->setMethod(\strtoupper($method));
 
         return $this->request($path, $headers);
     }
