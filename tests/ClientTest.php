@@ -17,7 +17,7 @@ class ClientTest extends TestCase
         $this->assertEquals(3, $this->app->make('log-mock')->count());
         $this->assertArrayHasKey('API Data', $this->app->make('log-mock')->toArray());
         $this->assertArrayHasKey('API End', $this->app->make('log-mock')->toArray());
-        $this->assertArrayHasKey('API Begin', $this->app->make('log-mock')->toArray());
+        $this->assertArrayHasKey('API Start', $this->app->make('log-mock')->toArray());
 
         // 400 ClientError
         $response = $this->app
