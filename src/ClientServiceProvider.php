@@ -6,6 +6,9 @@ use Illuminate\Support\ServiceProvider;
 
 class ClientServiceProvider extends ServiceProvider
 {
+
+    protected $defer = true;
+
     /**
      * Register the service provider.
      *
