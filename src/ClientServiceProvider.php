@@ -6,7 +6,6 @@ use Illuminate\Support\ServiceProvider;
 
 class ClientServiceProvider extends ServiceProvider
 {
-
     protected $defer = true;
 
     /**

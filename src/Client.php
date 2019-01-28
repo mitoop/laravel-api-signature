@@ -10,7 +10,6 @@ namespace Mitoop\ApiSignature;
  */
 class Client
 {
-
     const SCHEME_HTTP = 'http';
     const SCHEME_HTTPS = 'https';
 
@@ -20,7 +19,7 @@ class Client
     const FORM_DATA_METHODS = [
           'POST',
           'PUT',
-          'DELETE'
+          'DELETE',
     ];
 
     const SUPPORTED_HTTP_METHODS = [
@@ -307,7 +306,7 @@ class Client
             'contents' => $response->getBody()->getContents(),
             'request_start' => $requestStart,
             'request_end' => $requestEnd,
-            'time' => ($requestEnd-$requestStart).'s',
+            'time' => ($requestEnd - $requestStart).'s',
         ]);
 
         return new SignatureResponse($response);
@@ -386,8 +385,8 @@ class Client
         $data = [];
         $data['http_errors'] = false;
         $data['headers'] = [];
-        
-        if(\in_array($this->getMethod(), self::FORM_DATA_METHODS)) {
+
+        if (\in_array($this->getMethod(), self::FORM_DATA_METHODS)) {
             $data['form_params'] = $this->getDatas();
         }
 
@@ -404,8 +403,8 @@ class Client
         if ($this->getScheme() == self::SCHEME_HTTPS) {
             $data['verify'] = $this->getCertPem();
         }
-        
-        if(empty($data['headers'])) {
+
+        if (empty($data['headers'])) {
             unset($data['headers']);
         }
 
@@ -423,11 +422,11 @@ class Client
             throw new \InvalidArgumentException('Magic request methods require at least a URI');
         }
 
-        $path    = $args[0];
-        $datas   = $args[1] ?? [];
+        $path = $args[0];
+        $datas = $args[1] ?? [];
         $headers = $args[2] ?? [];
 
-        if ( ! \in_array($method, self::SUPPORTED_HTTP_METHODS)) {
+        if (! \in_array($method, self::SUPPORTED_HTTP_METHODS)) {
             throw new \InvalidArgumentException('The magic method is not supported');
         }
 
