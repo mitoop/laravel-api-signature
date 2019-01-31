@@ -30,6 +30,13 @@ abstract class TestCase extends BaseTestCase
         ];
     }
 
+    protected function getPackageAliases($app)
+    {
+        return [
+            'ApiClient' => \Mitoop\ApiSignature\Facades\Client::class
+        ];
+    }
+
     /**
      * Define environment setup.
      *
@@ -49,6 +56,8 @@ abstract class TestCase extends BaseTestCase
 
             return new ClientManager($app, new Client(['handler' => $handler]));
         });
+
+        $app['config']->set('api-signature.default', $this->testingClient);
 
         $app['config']->set("api-signature.clients.{$this->testingClient}", [
             'app_id'     => 'testing_app_id',

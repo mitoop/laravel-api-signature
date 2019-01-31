@@ -2,6 +2,8 @@
 
 namespace Mitoop\ApiSignature;
 
+use Closure;
+
 /**
  * @method  SignatureResponse  get($path, array $data = null, array $headers = null)
  * @method  SignatureResponse  post($path, array $data = null, array $headers = null)
@@ -254,6 +256,49 @@ class Client
         }
     }
 
+    /**
+     * Fires an event for the Client.
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    protected function fireEvent($name)
+    {
+        return app('events')->fire('mitoop.laravel-api-signature.' . $name, [$this]);
+    }
+
+    /**
+     * Listen for an event on the Client.
+     *
+     * @param  string $name
+     * @param  \Closure $callback
+     * @return mixed
+     */
+    protected static function listenEvent($name, Closure $callback)
+    {
+        return app('events')->listen('mitoop.laravel-api-signature.' . $name, $callback);
+    }
+
+    /**
+     * Fires the "mitoop.laravel-api-signature.requesting" event.
+     *
+     * @param Closure $callback
+     */
+    public static function requesting(Closure $callback)
+    {
+        static::listenEvent('requesting', $callback);
+    }
+
+    /**
+     * Fires the "mitoop.laravel-api-signature.requested" event.
+     *
+     * @param Closure $callback
+     */
+    public static function requested(Closure $callback)
+    {
+        static::listenEvent('requested', $callback);
+    }
+
     public function setCertPem($certPem)
     {
         $this->certPem = $certPem;
@@ -299,7 +344,11 @@ class Client
 
         $this->resolveLog('API Data', ['method' => $this->getMethod(), 'data' => $data, 'url' => $url]);
 
+        $this->fireEvent('requesting');
+
         $response = $this->httpClient->request($this->getMethod(), $url, $data);
+
+        $this->fireEvent('requested');
 
         $requestEnd = \time();
         $this->resolveLog('API End', [

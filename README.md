@@ -133,6 +133,21 @@ public function handle($request, \Closure $next)
  ];
 ```
 
+### 事件 Events
+
+requesting 和 requestied 是请求前和请求后的事件，可以方便地对请求进行额外的处理。
+
+```php
+\ApiClient::requesting(function (Mitoop\ApiSignature\Client $client) {
+    # 请求发起之前
+});
+
+\ApiClient::requested(function (Mitoop\ApiSignature\Client $client) {
+    # 请求发起之后
+});
+
+```
+
 ## 响应 Response
 
 HTTP 请求依赖了 `guzzle/guzzle` 包, 并设置了 `http_errors` 为 `false`, 请求不再抛出异常, 即使发生了错误, 每次请求都会返回 `\Mitoop\ApiSignature\SignatureResponse` 对象(参考自[zttp](https://github.com/kitetail/zttp)) `SignatureResponse` 提供了一些简洁有力的方法。

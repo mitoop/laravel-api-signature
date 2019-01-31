@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Mitoop\ApiSignature\Client;
 use Mitoop\ApiSignature\ClientManager;
 
 class ClientTest extends TestCase
@@ -56,5 +57,33 @@ class ClientTest extends TestCase
             ->connect($this->testingClient)
             ->get('/', ['foo' => 'bar']);
         $this->assertTrue($response->isServerError());
+    }
+
+    public function testRequestingAndRequested()
+    {
+        $requestingContent = 'this is requesting';
+        $requestedContent = 'this is requestied';
+
+        $requestedFiredContent = $requestingFiredContent = '';
+
+        // Set requesting event.
+        \ApiClient::requesting(function (Client $client) use ($requestingContent, &$requestingFiredContent) {
+            $requestingFiredContent = $requestingContent;
+        });
+
+        // Set requesting event.
+        \ApiClient::requested(function (Client $client) use ($requestedContent, &$requestedFiredContent) {
+            $requestedFiredContent = $requestedContent;
+        });
+
+        // There is nothing.
+        $this->assertEquals('', $requestingFiredContent);
+        $this->assertEquals('', $requestedFiredContent);
+
+        // Send request.
+        \ApiClient::post('/', ['foo' => 'bar']);
+
+        $this->assertEquals($requestingContent, $requestingFiredContent);
+        $this->assertEquals($requestedContent, $requestedFiredContent);
     }
 }
