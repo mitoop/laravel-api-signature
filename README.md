@@ -134,7 +134,7 @@ public function handle($request, \Closure $next)
 
 ### 事件 Events
 
-requesting 和 requestied 是请求前和请求后的事件，可以方便地对请求进行额外的处理。
+requesting 和 requested 是请求前和请求后的事件，可以方便地对请求进行额外的处理。
 
 ```php
 \ApiClient::requesting(function (Mitoop\ApiSignature\Client $client) {
