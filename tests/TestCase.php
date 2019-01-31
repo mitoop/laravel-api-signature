@@ -44,6 +44,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app->loadDeferredProvider(ClientServiceProvider::class);
+
         $this->testingBody = json_encode(['name' => 'mitoop']);
 
         $app->singleton(ClientManager::class, function ($app) {
