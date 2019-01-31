@@ -83,7 +83,7 @@ ApiClient::connect('another-client')->get('/api/demo', ['foo' => 'bar']);
 ApiClient::connect('another-client')->post('/api/demo', ['foo' => 'bar']);
 ```
 
-如果设置了 `default`值 并向默认的客户端发起请求 这个时候不用指定connect的客户端
+如果设置了 `default`值 并向默认的客户端发起请求 这个时候可以不指定具体的connect的客户端
 
 ```php
 ApiClient::connect()->get('/api/demo', ['foo' => 'bar']);
@@ -96,23 +96,19 @@ ApiClient::post('/api/demo', ['foo' => 'bar']);
 
 ```
 
-
 如有没有设置`alias` 那么可以用`Facade` 或者 容器调用 
 
 ```php
 // Facade模式
 Mitoop\ApiSignature\Facades\Client::connect('client-one')->get('/api/demo', ['foo' => 'bar']);
 Mitoop\ApiSignature\Facades\Client::connect('client-one')->post('/api/demo', ['foo' => 'bar']);
-```
 
-
-```php
 // 容器模式
 app(\Mitoop\ApiSignature\Client::class)->connect('another-client')->get('/api/demo', ['foo' => 'bar']);
 app()->make(\Mitoop\ApiSignature\Client::class)->connect('another-client')->post('/api/demo', ['foo' => 'bar']);
 ```
 
-如果作为服务端，很可能要用到中间件进行校验，例如：
+如果作为服务端，肯定要验证签名, 可以在中间件中进行验证
 
 ```php
 // Mitoop\ApiSignature\SignatureMiddleware::class
@@ -133,6 +129,9 @@ public function handle($request, \Closure $next)
  ];
 ```
 
+目前可用的请求方法 : `get`, `post`, `put`, `delete`
+
+
 ### 事件 Events
 
 requesting 和 requestied 是请求前和请求后的事件，可以方便地对请求进行额外的处理。
@@ -145,7 +144,6 @@ requesting 和 requestied 是请求前和请求后的事件，可以方便地对
 \ApiClient::requested(function (Mitoop\ApiSignature\Client $client) {
     # 请求发起之后
 });
-
 ```
 
 ## 响应 Response
